@@ -7,6 +7,10 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <>
+      <title>Clima App</title>
+      <link rel="icon" href="☀️" />
+    </>
     <App />
   </React.StrictMode>
 );
