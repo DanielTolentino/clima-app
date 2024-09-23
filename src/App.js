@@ -1,23 +1,70 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
+const api = {
+  API_KEY: process.env.API_KEY,
+  base: "https://api.openweathermap.org/data/2.5/"
+}
+
 function App() {
+  const [query, setQuery] = useState('');
+  const [weather, setWeather] = useState({});
+
+  const search = evt => {
+    if (evt.key === "Enter") {
+      fetch(`${api.base}weather?q=${query}&lang=pt_br&units=metric&APPID=${api.API_KEY}`)
+        .then(res => res.json())
+        .then(result => {
+          setWeather(result);
+          setQuery('');
+          console.log(result);
+        });
+    }
+  }
+
+  const getBackgroundClass = () => {
+    if (weather.main && weather.main.temp > 15) {
+      return 'app warm';
+    }
+    return 'app cold';
+  }
+
+  const getWeatherIcon = () => {
+    if (weather.weather && weather.weather[0]) {
+      return `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`;
+    }
+    return '';
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={getBackgroundClass()}>
+      <main>
+        <div className="search-box">
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Pesquisar..."
+            onChange={e => setQuery(e.target.value)}
+            value={query}
+            onKeyPress={search}
+          />
+        </div>
+        {(typeof weather.main != "undefined") ? (
+        <div>
+          <div className="location-box">
+            <div className="location">{weather.name}, {weather.sys.country}</div>
+            <div className="date">{new Date().toLocaleDateString()}</div>
+          </div>
+          <div className="weather-box">
+            <div className="temp">
+              {Math.round(weather.main.temp)}°C
+            </div>
+            <div className="weather">{weather.weather[0].description}</div>
+            <img src={getWeatherIcon()} alt="Weather icon" className="weather-icon" />
+          </div>
+        </div>
+        ) : ('')}
+      </main>
     </div>
   );
 }
